@@ -49,7 +49,7 @@ def create_route():
         Item={
             'routeId': {'S': route_id },
             'name': {'S': name },
-            'coordinates': {'L': {i: coordinates[i] for i in range(len(coordinates)) }}
+            'coordinates': {'M': {i: coordinates[i] for i in range(len(coordinates)) }}
 #             'coordinates': {'L': [{i: coordinates[i]} for i in range(len(coordinates)) ]}
 #             'coordinates': {'M': coordinates }
         }
