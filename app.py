@@ -4,8 +4,12 @@ import os
 
 import boto3
 
+from boto3.dynamodb import types
 from flask import Flask, jsonify, request
+
 app = Flask(__name__)
+serializer = types.TypeSerializer()
+deserializer = types.TypeDeserializer()
 
 ROUTES_TABLE = os.environ['ROUTES_TABLE']
 client = boto3.client('dynamodb')
@@ -15,7 +19,6 @@ table = dynamodb.Table(ROUTES_TABLE)
 @app.route("/")
 def hello():
     return "Hello World!"
-
 
 @app.route("/routes/<string:route_id>")
 def get_route(route_id):
@@ -27,13 +30,17 @@ def get_route(route_id):
     )
     item = resp.get('Item')
     if not item:
-        return jsonify({'error': 'User does not exist'}), 404
+        return jsonify({'error': 'Route does not exist'}), 404
 
-    return jsonify({
-        'routeId': item.get('routeId').get('S'),
-        'name': item.get('name').get('S'),
-        'coordinates': item.get('coordinates').get('L')
-    })
+    print(resp)
+    print(item)
+    return deserializer.deserialize({'M': item})
+
+#     return jsonify({
+#         'routeId': item.get('routeId').get('S'),
+#         'name': item.get('name').get('S'),
+#         'coordinates': deserializer.deserialize(item.get('coordinates'))
+#     })
 
 
 @app.route("/routes", methods=["POST"])
@@ -50,7 +57,8 @@ def create_route():
         Item={
             'routeId': {'S': route_id },
             'name': {'S': name },
-            'coordinates': {'L': [{'NS': c for c in coordinates}]
+            'coordinates': serializer.serialize(coordinates)
+#             'coordinates': {'L': [{'M': c for c in coordinates}]}
         }
     )
 
