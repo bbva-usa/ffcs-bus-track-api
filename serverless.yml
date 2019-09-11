@@ -5,8 +5,14 @@ service: ffcs-bus-track-api
 plugins:
   - serverless-python-requirements
   - serverless-wsgi
+  - serverless-domain-manager
 
 custom:
+  customDomain:
+    domainName: api.dudewheresmybus.com
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
   routesTableName: 'routes-table-${self:provider.stage}'
   pointsOfInterestTableName: 'points-of-interest-table-${self:provider.stage}'
   wsgi:
