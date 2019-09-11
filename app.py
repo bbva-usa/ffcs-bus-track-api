@@ -70,7 +70,6 @@ def create_route():
             'name': {'S': name},
             'timeOfDay': {'S': timeOfDay},
             'coordinates': serializer.serialize(coordinates)
-            #             'coordinates': {'L': [{'M': c for c in coordinates}]}
         }
     )
 
