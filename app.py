@@ -18,6 +18,7 @@ client = boto3.client('dynamodb')
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(ROUTES_TABLE)
 
+
 @app.route("/")
 def hello():
     return "Hello World!"
@@ -28,7 +29,7 @@ def get_route(route_id):
     resp = client.get_item(
         TableName=ROUTES_TABLE,
         Key={
-            'routeId': { 'S': route_id }
+            'routeId': {'S': route_id}
         }
     )
 
@@ -48,9 +49,8 @@ def get_routes():
     items = resp.get('Items')
     if not items:
         return jsonify({'error': 'Route does not exist'}), 404
-    _resp = deserializer.deserialize({'L': [{'M': i for i in items}]})
+    _resp = [ deserializer.deserialize({'M': i}) for i in items ]
     return jsonify(_resp)
-
 
 
 @app.route("/routes", methods=["POST"])
@@ -66,11 +66,11 @@ def create_route():
     resp = client.put_item(
         TableName=ROUTES_TABLE,
         Item={
-            'routeId': {'S': route_id },
-            'name': {'S': name },
+            'routeId': {'S': route_id},
+            'name': {'S': name},
             'timeOfDay': {'S': timeOfDay},
             'coordinates': serializer.serialize(coordinates)
-#             'coordinates': {'L': [{'M': c for c in coordinates}]}
+            #             'coordinates': {'L': [{'M': c for c in coordinates}]}
         }
     )
 
@@ -79,6 +79,7 @@ def create_route():
         'name': name,
         'coordinates': coordinates
     })
+
 
 @app.route("/routes", methods=["DELETE"])
 def delete_routes():
