@@ -7,7 +7,8 @@ plugins:
   - serverless-wsgi
 
 custom:
-  tableName: 'routes-table-${self:provider.stage}'
+  routesTableName: 'routes-table-${self:provider.stage}'
+  pointsOfInterestTableName: 'points-of-interest-table-${self:provider.stage}'
   wsgi:
     app: app.app
     packRequirements: false
@@ -31,8 +32,10 @@ provider:
         - dynamodb:BatchWriteItem
       Resource:
         - { "Fn::GetAtt": ["RoutesDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["PointsOfInterestDynamoDBTable", "Arn" ] }
   environment:
-    ROUTES_TABLE: ${self:custom.tableName}
+    ROUTES_TABLE: ${self:custom.routesTableName}
+    POINTS_OF_INTEREST_TABLE: ${self:custom.pointsOfInterestTableName}
 
 functions:
   app:
@@ -56,6 +59,19 @@ resources:
             AttributeName: routeId
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 3
-          WriteCapacityUnits: 3
-        TableName: ${self:custom.tableName}
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.routesTableName}
+    PointsOfInterestDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: pointOfInterestId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pointOfInterestId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.pointsOfInterestTableName}
