@@ -20,6 +20,7 @@ table = dynamodb.Table(ROUTES_TABLE)
 def hello():
     return "Hello World!"
 
+
 @app.route("/routes/<string:route_id>")
 def get_route(route_id):
     resp = client.get_item(
@@ -28,19 +29,26 @@ def get_route(route_id):
             'routeId': { 'S': route_id }
         }
     )
+
     item = resp.get('Item')
     if not item:
         return jsonify({'error': 'Route does not exist'}), 404
 
-    print(resp)
-    print(item)
-    return deserializer.deserialize({'M': item})
+    _resp = deserializer.deserialize({'M': item})
+    return jsonify(_resp)
 
-#     return jsonify({
-#         'routeId': item.get('routeId').get('S'),
-#         'name': item.get('name').get('S'),
-#         'coordinates': deserializer.deserialize(item.get('coordinates'))
-#     })
+
+@app.route("/routes")
+def get_routes():
+    resp = client.scan(
+        TableName=ROUTES_TABLE,
+    )
+    items = resp.get('Items')
+    if not items:
+        return jsonify({'error': 'Route does not exist'}), 404
+    _resp = deserializer.deserialize({'L': [{'M': i for i in items}]})
+    return jsonify(_resp)
+
 
 
 @app.route("/routes", methods=["POST"])
@@ -61,14 +69,6 @@ def create_route():
 #             'coordinates': {'L': [{'M': c for c in coordinates}]}
         }
     )
-
-#     table.put_item(
-#         Item={
-#             'route_id' = route_id,
-#             'name' = name,
-#             'coordinates' = coordinates
-#         }
-#     )
 
     return jsonify({
         'routeId': route_id,
