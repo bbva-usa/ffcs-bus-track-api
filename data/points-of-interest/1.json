@@ -1,8 +1,8 @@
 {
-        "pointOfInterestId": "1",
-        "name": "Glen Oaks Elementary School",
-        "location": "1301 Highland Dr, Fairfield, AL 35064",
-        "latitude": "33.4596563",
-        "longitude": "-86.9279233",
-        "type": "school"
-    }
+  "pointOfInterestId": "1",
+  "name": "Glen Oaks Elementary School",
+  "location": "1301 Highland Dr, Fairfield, AL 35064",
+  "latitude": "33.4596563",
+  "longitude": "-86.9279233",
+  "type": "school"
+}
