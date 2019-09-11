@@ -55,6 +55,7 @@ def get_routes():
 def create_route():
     route_id = request.json.get('routeId')
     name = request.json.get('name')
+    timeOfDay = request.json.get('timeOfDay')
     coordinates = request.json.get('coordinates')
     print(request)
     if not route_id or not name:
@@ -65,6 +66,7 @@ def create_route():
         Item={
             'routeId': {'S': route_id },
             'name': {'S': name },
+            'timeOfDay': {'S': timeOfDay},
             'coordinates': serializer.serialize(coordinates)
 #             'coordinates': {'L': [{'M': c for c in coordinates}]}
         }
@@ -75,3 +77,15 @@ def create_route():
         'name': name,
         'coordinates': coordinates
     })
+
+@app.route("/routes", methods=["DELETE"])
+def delete_routes():
+    scan = table.scan()
+    with table.batch_writer() as batch:
+        for each in scan['Items']:
+            batch.delete_item(
+                Key={
+                    'routeId': each['routeId']
+                }
+            )
+    return jsonify({})
